@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>ML API - Dermatology Diagnosis Tool</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            background-image: url('Images/dev.jpg');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            color: #333;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 400;
+            text-align: center;
+            color: #fff;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .login {
+            background-color: rgba(255, 255, 255, 0.9);
+            width: 300px;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        h3 {
+            font-size: 24px;
+            font-weight: 400;
+            color: #333;
+        }
+
+        video {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        #captureButton {
+            font-size: 18px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #captureButton .fa-camera {
+            margin-right: 5px;
+        }
+
+        #upload-label, #diagnose-btn {
+            display: inline-flex;
+            align-items: center;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #upload-label .fa-upload {
+            margin-right: 5px;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        img#capturedImage {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+        }
+
+        /* Add your additional CSS styles here */
+
+    </style>
+</head>
+<body>
+<div id="container">
+    <h1><b>Dermatology Diagnosis Tool</b></h1>
+    <div class="login">
+        <h3>Skin Care Problems</h3>
+        <p>Click the "Capture" button to take a picture of the skin condition:</p>
+        <video id="video" width="640" height="480" autoplay></video>
+        <button id="captureButton">Capture <i class="fas fa-camera"></i></button>
+        <canvas id="canvas" width="640" height="480"></canvas>
+        <img id="capturedImage" src="" alt="Captured Image">
+        <!-- Main Input For Receiving Query to our ML -->
+        <form action="{{ url_for('predict')}}" method="post">
+            <section id="image-upload">
+                <h2>Upload an Image of the Skin Condition</h2>
+                <label id="upload-label" for="upload-btn">
+                    <i class="fas fa-upload"></i>Choose File</label>
+                <input type="file" id="upload-btn" accept="image/*">
+                <img id="uploaded-image" src="#" alt="Uploaded Image">
+                <button id="diagnose-btn">Diagnose <i class="fas fa-search"></i></button>
+            </section>
+            <section id="diagnosis-result">
+                <h2>Diagnosis Result</h2>
+                <p id="diagnosis-text">Please upload an image for diagnosis.</p>
+            </section>
+            <button type="submit" class="btn btn-primary btn-block btn-large">Predict</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const video = document.getElementById('video');
+    const captureButton = document.getElementById('captureButton');
+    const canvas = document.getElementById('canvas');
+    const capturedImage = document.getElementById('capturedImage');
+
+    // Access the user's webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function (stream) {
+            video.srcObject = stream;
+        })
+        .catch(function (error) {
+            console.error('Error accessing the webcam: ', error);
+        });
+
+    // Capture an image from the webcam and display it
+    captureButton.addEventListener('click', function () {
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        capturedImage.src = canvas.toDataURL('image/png');
+    });
+</script>
+
+</body>
+</html>
